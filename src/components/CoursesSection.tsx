@@ -1,9 +1,19 @@
-import { Button } from "@/components/ui/button";
+import { EnhancedButton } from "@/components/ui/enhanced-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, Users, Trophy } from "lucide-react";
+import { Star, Clock, Users, Trophy, ArrowRight, ExternalLink } from "lucide-react";
+import { useNavigationAction } from "@/hooks/useButtonInteraction";
+import { useNavigate } from "react-router-dom";
 
 const CoursesSection = () => {
+  const navigate = useNavigate();
+  
+  // Button interactions
+  const { isLoading: isEnrollLoading, handleClick } = useNavigationAction({
+    loadingText: 'Processing...',
+    successText: 'Redirecting to payment...'
+  });
+
   const courses = [
     {
       id: 1,
@@ -113,18 +123,41 @@ const CoursesSection = () => {
                 </div>
 
                 {/* CTA Button */}
-                <Button className="w-full bg-primary hover:bg-primary-hover text-primary-foreground">
-                  Enroll Now
-                </Button>
+                                 <EnhancedButton 
+                   variant="gradient"
+                   loading={isEnrollLoading}
+                   icon={<ExternalLink className="w-4 h-4" />}
+                   onClick={() => handleClick(async () => {
+                     // Simulate loading delay
+                     await new Promise(resolve => setTimeout(resolve, 800));
+                     // Navigate to payment page with course ID
+                     navigate(`/payment?courseId=${course.id}`);
+                   })}
+                   className="w-full group"
+                 >
+                   Enroll Now
+                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                 </EnhancedButton>
               </CardContent>
             </Card>
           ))}
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-            View All Courses
-          </Button>
+                     <EnhancedButton 
+             variant="outline" 
+             size="lg" 
+             loading={isEnrollLoading}
+             icon={<ArrowRight className="w-4 h-4" />}
+             iconPosition="right"
+             onClick={() => handleClick(async () => {
+               await new Promise(resolve => setTimeout(resolve, 800));
+               navigate('/offerings');
+             })}
+             className="border-primary text-primary hover:bg-primary hover:text-primary-foreground group"
+           >
+             View All Courses
+           </EnhancedButton>
         </div>
       </div>
     </section>

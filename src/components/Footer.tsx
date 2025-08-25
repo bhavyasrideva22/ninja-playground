@@ -1,24 +1,64 @@
-import { Button } from "@/components/ui/button";
+import { EnhancedButton } from "@/components/ui/enhanced-button";
 import { Input } from "@/components/ui/input";
-import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Send } from "lucide-react";
+import { useButtonInteraction } from "@/hooks/useButtonInteraction";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+
+  // Button interactions
+  const { isLoading: isSubscribeLoading, handleClick: handleSubscribe } = useButtonInteraction({
+    loadingText: 'Subscribing...',
+    successText: 'Subscribed successfully!',
+    errorText: 'Please enter a valid email'
+  });
+
   const footerSections = [
     {
       title: "Courses",
-      links: ["Full Stack Development", "Data Science", "Machine Learning", "Android Development", "System Design", "Competitive Programming"]
+      links: [
+        { text: "All Courses", href: "/offerings" },
+        { text: "Full Stack Development", href: "/offerings" },
+        { text: "Data Science", href: "/offerings" },
+        { text: "Machine Learning", href: "/offerings" },
+        { text: "Android Development", href: "/offerings" },
+        { text: "System Design", href: "/offerings" }
+      ]
     },
     {
       title: "Programs",
-      links: ["Job Bootcamp", "IIT Certifications", "Placement Assistance", "1:1 Mentorship", "Mock Interviews", "Resume Building"]
+      links: [
+        { text: "Job Bootcamp", href: "/offerings" },
+        { text: "IIT Certifications", href: "/offerings" },
+        { text: "Placement Assistance", href: "/about" },
+        { text: "1:1 Mentorship", href: "/about" },
+        { text: "Mock Interviews", href: "/about" },
+        { text: "Resume Building", href: "/about" }
+      ]
     },
     {
-      title: "Company",
-      links: ["About Us", "Our Team", "Careers", "Contact Us", "Blog", "Success Stories"]
+                        title: "Company",
+                  links: [
+                    { text: "About Us", href: "/about" },
+                    { text: "Our Team", href: "#" },
+                    { text: "Careers", href: "#" },
+                    { text: "Contact Us", href: "#" },
+                    { text: "Blog", href: "#" },
+                    { text: "Success Stories", href: "/success-stories" }
+                  ]
     },
     {
       title: "Support",
-      links: ["Help Center", "Privacy Policy", "Terms of Service", "Refund Policy", "Student Support", "Technical Support"]
+      links: [
+        { text: "Help Center", href: "/about" },
+        { text: "Privacy Policy", href: "/about" },
+        { text: "Terms of Service", href: "/about" },
+        { text: "Refund Policy", href: "/about" },
+        { text: "Student Support", href: "/about" },
+        { text: "Technical Support", href: "/about" }
+      ]
     }
   ];
 
@@ -33,11 +73,27 @@ const Footer = () => {
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <Input 
                 placeholder="Enter your email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="bg-white text-gray-900 border-none flex-1"
               />
-              <Button className="bg-primary hover:bg-primary-hover text-primary-foreground px-8">
+              <EnhancedButton 
+                variant="gradient"
+                loading={isSubscribeLoading}
+                icon={<Send className="w-4 h-4" />}
+                onClick={() => handleSubscribe(async () => {
+                  if (!email || !email.includes('@')) {
+                    throw new Error('Please enter a valid email');
+                  }
+                  // Simulate API call
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                  console.log('Subscribed:', email);
+                  setEmail('');
+                })}
+                className="px-8"
+              >
                 Subscribe
-              </Button>
+              </EnhancedButton>
             </div>
           </div>
         </div>
@@ -56,8 +112,19 @@ const Footer = () => {
               Empowering millions of learners to achieve their tech career goals through industry-relevant courses and expert mentorship.
             </p>
             <div className="flex space-x-4">
-              {[Facebook, Twitter, Instagram, Linkedin, Youtube].map((Icon, index) => (
-                <div key={index} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-primary transition-colors cursor-pointer">
+              {[
+                { Icon: Facebook, url: 'https://facebook.com/codingninjas' },
+                { Icon: Twitter, url: 'https://twitter.com/codingninjas' },
+                { Icon: Instagram, url: 'https://instagram.com/codingninjas' },
+                { Icon: Linkedin, url: 'https://linkedin.com/company/codingninjas' },
+                { Icon: Youtube, url: 'https://youtube.com/codingninjas' }
+              ].map(({ Icon, url }, index) => (
+                <div 
+                  key={index} 
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-primary hover:scale-110 transition-all duration-300 cursor-pointer transform"
+                  onClick={() => window.open(url, '_blank')}
+                  title={`Follow us on ${Icon.name}`}
+                >
                   <Icon className="w-5 h-5" />
                 </div>
               ))}
@@ -71,9 +138,21 @@ const Footer = () => {
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a href="#" className="text-gray-300 hover:text-primary transition-colors">
-                      {link}
-                    </a>
+                    {link.href.startsWith('/') ? (
+                      <Link 
+                        to={link.href}
+                        className="text-gray-300 hover:text-primary transition-colors"
+                      >
+                        {link.text}
+                      </Link>
+                    ) : (
+                      <a 
+                        href={link.href} 
+                        className="text-gray-300 hover:text-primary transition-colors"
+                      >
+                        {link.text}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -87,9 +166,9 @@ const Footer = () => {
             © 2024 Coding Ninjas. All rights reserved.
           </p>
           <div className="flex items-center space-x-6 text-sm text-gray-400">
-            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-primary transition-colors">Cookie Policy</a>
+            <a href="/about" className="hover:text-primary transition-colors">Privacy Policy</a>
+            <a href="/about" className="hover:text-primary transition-colors">Terms of Service</a>
+            <a href="/about" className="hover:text-primary transition-colors">Cookie Policy</a>
           </div>
         </div>
       </div>
